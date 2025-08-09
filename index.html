@@ -1,0 +1,3763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MenuBase - Multiple Things On Single Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: #333;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+            z-index: -1;
+            animation: subtleFloat 30s ease-in-out infinite;
+        }
+
+        @keyframes subtleFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(-10px, -15px) scale(1.02); }
+            50% { transform: translate(5px, -10px) scale(0.98); }
+            75% { transform: translate(-5px, 5px) scale(1.01); }
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 30%, #16213e 60%, #0f3460 100%);
+            color: #fff;
+        }
+
+        body.dark-mode::before {
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(100, 150, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(150, 100, 255, 0.03) 0%, transparent 70%);
+        }
+
+        /* Enhanced Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #5a6fd8, #6a4190, #e67e22);
+            transform: scale(1.1);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Enhanced Animated Background */
+        .app-container::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 60% 60%, rgba(255, 200, 100, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            animation: float 25s ease-in-out infinite;
+        }
+
+        .app-container::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 90%, rgba(100, 200, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 10%, rgba(255, 100, 200, 0.1) 0%, transparent 40%);
+            z-index: -1;
+            animation: floatReverse 30s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            25% { transform: translateY(-15px) rotate(0.5deg) scale(1.01); }
+            50% { transform: translateY(10px) rotate(-0.5deg) scale(0.99); }
+            75% { transform: translateY(-5px) rotate(0.3deg) scale(1.005); }
+        }
+
+        @keyframes floatReverse {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            25% { transform: translateY(15px) rotate(-0.5deg) scale(0.99); }
+            50% { transform: translateY(-10px) rotate(0.5deg) scale(1.01); }
+            75% { transform: translateY(5px) rotate(-0.3deg) scale(0.995); }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(25px) saturate(180%);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.12),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+        }
+
+        .dark-mode .sidebar {
+            background: rgba(20, 20, 25, 0.92);
+            border-right-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+        }
+
+        .sidebar-header {
+            padding: 28px 24px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+                @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .dark-mode .sidebar-header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header img {
+            width: 100%;
+            height: auto;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header img:hover {
+            transform: scale(1.02);
+        }
+
+        .sidebar-title {
+            padding: 20px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .dark-mode .sidebar-title {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 24px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            margin: 8px 16px;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-weight: 500;
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .menu-item:hover::before {
+            left: 100%;
+        }
+
+        .menu-item:hover {
+            background: rgba(102, 126, 234, 0.15);
+            transform: translateX(10px) scale(1.02);
+            box-shadow: 
+                0 8px 25px rgba(102, 126, 234, 0.25),
+                0 0 0 1px rgba(102, 126, 234, 0.2) inset;
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .dark-mode .menu-item:hover {
+            background: rgba(79, 172, 254, 0.1);
+            box-shadow: 0 4px 20px rgba(79, 172, 254, 0.2);
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 
+                0 12px 30px rgba(102, 126, 234, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+            transform: translateX(12px) scale(1.03);
+            border-color: rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+        }
+
+        .dark-mode .menu-item.active {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .menu-item i {
+            margin-right: 16px;
+            font-size: 22px;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 320px;
+            padding: 40px;
+            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .content-header {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(25px) saturate(180%);
+            padding: 28px 36px;
+            border-radius: 24px;
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.12),
+                0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 4s infinite;
+        }
+
+        .dark-mode .content-header {
+            background: rgba(30, 30, 30, 0.95);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dark-mode .header-title {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .theme-toggle {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .dark-mode .theme-toggle {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(180deg);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .dark-mode .theme-toggle:hover {
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        /* Content Area */
+        .content-area {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 32px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode .content-area {
+            background: rgba(30, 30, 30, 0.95);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(25px) saturate(180%);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.12),
+                0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 200% 0; }
+            50% { background-position: -200% 0; }
+        }
+
+        .dark-mode .feature-card {
+            background: rgba(45, 45, 45, 0.9);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 
+                0 24px 50px rgba(102, 126, 234, 0.25),
+                0 0 0 1px rgba(102, 126, 234, 0.2) inset;
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .dark-mode .feature-card:hover {
+            box-shadow: 0 20px 40px rgba(79, 172, 254, 0.2);
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .feature-icon {
+            margin-right: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 28px;
+            transition: transform 0.3s ease;
+        }
+
+        .dark-mode .feature-icon {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dark-mode .feature-title {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .feature-description {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .dark-mode .feature-description {
+            color: #ccc;
+        }
+
+        /* Chips */
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            color: #667eea;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .dark-mode .chip {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.1));
+            color: #4facfe;
+            border-color: rgba(79, 172, 254, 0.3);
+        }
+
+        .chip:hover {
+            transform: translateY(-2px) scale(1.05);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .dark-mode .chip:hover {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.2), rgba(0, 242, 254, 0.2));
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .chip i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        /* Mobile Responsive */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(40, 167, 69, 0.3);
+            z-index: 10000;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+            min-width: 300px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #dc3545, #e83e8c);
+            box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3);
+        }
+
+        .toast.info {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+        }
+
+        .dark-mode .toast {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            box-shadow: 0 8px 32px rgba(79, 172, 254, 0.3);
+        }
+
+        .dark-mode .toast.error {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+
+        /* Interactive Components */
+        .tool-section {
+            margin-bottom: 32px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .tool-section {
+            background: rgba(45, 45, 45, 0.8);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .tool-section h3 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dark-mode .tool-section h3 {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dark-mode .input-group label {
+            color: #fff;
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 16px;
+            font-size: 16px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(15px) saturate(180%);
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.05),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+        }
+
+        .dark-mode .input-group input, 
+        .dark-mode .input-group textarea, 
+        .dark-mode .input-group select {
+            background: rgba(60, 60, 60, 0.9);
+            border-color: rgba(79, 172, 254, 0.2);
+            color: #fff;
+        }
+
+        .input-group input:focus, 
+        .input-group textarea:focus, 
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .dark-mode .input-group input:focus, 
+        .dark-mode .input-group textarea:focus, 
+        .dark-mode .input-group select:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 6px 20px rgba(102, 126, 234, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 12px 30px rgba(102, 126, 234, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 
+                0 6px 20px rgba(102, 126, 234, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #e83e8c);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+        }
+
+        .result-area {
+            background: rgba(248, 249, 250, 0.9);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(102, 126, 234, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 20px;
+            min-height: 120px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .result-area {
+            background: rgba(45, 45, 45, 0.9);
+            border-color: rgba(79, 172, 254, 0.1);
+        }
+
+        .file-upload {
+            border: 3px dashed rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .file-upload:hover::before {
+            opacity: 1;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .file-upload.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: rgba(224, 224, 224, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .dark-mode .progress-bar {
+            background: rgba(60, 60, 60, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+            background-size: 200% 100%;
+            transition: width 0.3s ease;
+            animation: shimmer 2s ease-in-out infinite;
+            border-radius: 12px;
+        }
+
+        .dark-mode .progress-fill {
+            background: linear-gradient(90deg, #4facfe, #00f2fe, #4facfe);
+            background-size: 200% 100%;
+        }
+
+        .terminal {
+            background: linear-gradient(135deg, #1e1e1e, #2d2d2d);
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 16px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            height: 350px;
+            overflow-y: auto;
+            border: 2px solid rgba(0, 255, 0, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .terminal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(90deg, #ff5f56, #ffbd2e, #27ca3f);
+            border-radius: 14px 14px 0 0;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+        }
+
+        .terminal::after {
+            content: '● ● ●';
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            color: #333;
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+
+        .terminal-input {
+            background: none;
+            border: none;
+            color: #00ff00;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            caret-color: #00ff00;
+        }
+
+        .terminal-input::placeholder {
+            color: rgba(0, 255, 0, 0.5);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="https://img.freepik.com/premium-photo/techno-fashion-future-futuristic-technology-artificial-intelligence_173948-10290.jpg" alt="Logo">
+            </div>
+            <div class="sidebar-title">Creator Menu</div>
+            <div class="menu-item active" data-page="home">
+                <i class="material-icons">home</i>
+                🏠Home
+            </div>
+            <div class="menu-item" data-page="python">
+                <i class="material-icons">code</i>
+                🐍Python
+            </div>
+            <div class="menu-item" data-page="htmljs">
+                <i class="material-icons">web</i>
+                🧙‍♂️HTML/JS
+            </div>
+            <div class="menu-item" data-page="ml">
+                <i class="material-icons">psychology</i>
+                🧠 ML
+            </div>
+            <div class="menu-item" data-page="prompt">
+                <i class="material-icons">chat</i>
+                🎯 Prompt
+            </div>
+            <div class="menu-item" data-page="linux">
+                <i class="material-icons">terminal</i>
+                🐧Linux
+            </div>
+            <div class="menu-item" data-page="docker">
+                <i class="material-icons">storage</i>
+                🐳 Docker
+            </div>
+            <div class="menu-item" data-page="aws">
+                <i class="material-icons">cloud</i>
+                ☁️AWS
+            </div>
+            <div class="menu-item" data-page="kubernetes">
+                <i class="material-icons">account_tree</i>
+                🪄 Kubernetes
+            </div>
+            <div class="menu-item" data-page="agentic-ai">
+                <i class="material-icons">smart_toy</i>
+                🧞Agentic-Ai
+            </div>
+            <div class="menu-item" data-page="files">
+                <i class="material-icons">folder</i>
+                📁 Files
+            </div>
+            <div class="menu-item" data-page="windows">
+                <i class="material-icons">computer</i>
+                🪟 Windows
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="material-icons">menu</i>
+                </button>
+                <h1 class="header-title">MenuBase - Multiple Things On Single Platform</h1>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="material-icons">brightness_4</i>
+                </button>
+            </header>
+
+            <div class="content-area" id="contentArea">
+                <!-- Content will be loaded here -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Page content data
+        const pageContent = {
+            home: {
+                title: "Multiple Things On Single Platform",
+                subtitle: "Welcome to Menu Base",
+                features: [
+                    {
+                        icon: "📲",
+                        title: "📲 Automate Real-world Tasks",
+                        description: "WhatsApp, Email, Instagram automation"
+                    },
+                    {
+                        icon: "🌐",
+                        title: "🌐 HTML/JS Tools",
+                        description: "Camera, Location, SMS utilities"
+                    },
+                    {
+                        icon: "🐧",
+                        title: "🐧 Control Linux Machines",
+                        description: "SSH with voice and GUI control"
+                    },
+                    {
+                        icon: "🐳",
+                        title: "🐳 Manage Docker Containers",
+                        description: "Interactive container management"
+                    },
+                    {
+                        icon: "🤖",
+                        title: "🤖 Ask Gemini AI",
+                        description: "AI-powered assistance"
+                    },
+                    {
+                        icon: "📊",
+                        title: "📊 Machine Learning Models",
+                        description: "Linear Regression, Random Forest training"
+                    },
+                    {
+                        icon: "📈",
+                        title: "📈 Visualize & Predict",
+                        description: "Real-time predictions and graphs"
+                    },
+                    {
+                        icon: "🌗",
+                        title: "🌗 Light/Dark Mode",
+                        description: "Toggle themes with toast alerts"
+                    }
+                ],
+                chips: [
+                    { icon: "📲", label: "Python Automation" },
+                    { icon: "🌐", label: "HTML/JS Tools" },
+                    { icon: "🧠", label: "Machine Learning" },
+                    { icon: "🧞", label: "Agentic AI" },
+                    { icon: "☁️", label: "AWS Cloud" },
+                    { icon: "🪄", label: "Kubernetes" }
+                ]
+            },
+            python: {
+                title: "Python Development",
+                content: `
+                    <div class="tool-section">
+                        <h3>🐍 WhatsApp Automation</h3>
+                        <div class="input-group">
+                            <label>Phone Number:</label>
+                            <input type="tel" id="whatsappPhone" placeholder="+1234567890">
+                        </div>
+                        <div class="input-group">
+                            <label>Message:</label>
+                            <textarea id="whatsappMessage" rows="3" placeholder="Enter your message here..."></textarea>
+                        </div>
+                        <button class="btn" onclick="sendWhatsApp()">📱 Send WhatsApp Message</button>
+                        <div class="result-area" id="whatsappResult"></div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📧 Email Automation</h3>
+                        <div class="input-group">
+                            <label>To:</label>
+                            <input type="email" id="emailTo" placeholder="recipient@example.com">
+                        </div>
+                        <div class="input-group">
+                            <label>Subject:</label>
+                            <input type="text" id="emailSubject" placeholder="Email subject">
+                        </div>
+                        <div class="input-group">
+                            <label>Message:</label>
+                            <textarea id="emailBody" rows="4" placeholder="Email body..."></textarea>
+                        </div>
+                        <button class="btn" onclick="sendEmail()">📧 Send Email</button>
+                        <div class="result-area" id="emailResult"></div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>🤖 AI Code Generator</h3>
+                        <div class="input-group">
+                            <label>Describe what you want to build:</label>
+                            <textarea id="aiPrompt" rows="4" placeholder="Describe the Python code you want to generate..."></textarea>
+                        </div>
+                        <button class="btn" onclick="generateCode()">🤖 Generate Code</button>
+                        <div class="result-area" id="codeResult">
+                            <pre><code id="generatedCode"></code></pre>
+                        </div>
+                    </div>
+                `
+            },
+            htmljs: {
+                title: "HTML/JavaScript Tools",
+                content: `
+                    <div class="tool-section">
+                        <h3>📷 Camera Access</h3>
+                        <video id="camera" width="400" height="300" autoplay style="display: none; border-radius: 8px;"></video>
+                        <canvas id="canvas" width="400" height="300" style="display: none;"></canvas>
+                        <div id="cameraControls">
+                            <button class="btn" onclick="startCamera()">📷 Start Camera</button>
+                            <button class="btn" onclick="takePhoto()" style="display: none;">📸 Take Photo</button>
+                            <button class="btn btn-secondary" onclick="stopCamera()" style="display: none;">⏹️ Stop Camera</button>
+                        </div>
+                        <div class="result-area" id="cameraResult"></div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📍 Location Services</h3>
+                        <button class="btn" onclick="getLocation()">📍 Get My Location</button>
+                        <div class="result-area" id="locationResult"></div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>🔊 Text to Speech</h3>
+                        <div class="input-group">
+                            <label>Text to speak:</label>
+                            <textarea id="ttsText" rows="3" placeholder="Enter text to convert to speech..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Voice:</label>
+                            <select id="ttsVoice"></select>
+                        </div>
+                        <button class="btn" onclick="speakText()">🔊 Speak</button>
+                        <button class="btn btn-secondary" onclick="stopSpeaking()">⏹️ Stop</button>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>🧮 Calculator</h3>
+                        <div class="input-group">
+                            <input type="text" id="calculator" placeholder="Enter calculation (e.g., 2+3*4)" style="font-size: 18px;">
+                        </div>
+                        <button class="btn" onclick="calculate()">🧮 Calculate</button>
+                        <div class="result-area" id="calcResult"></div>
+                    </div>
+                `
+            },
+            ml: {
+                title: "Machine Learning",
+                content: `
+                    <div class="tool-section">
+                        <h3>📊 Data Upload & Analysis</h3>
+                        <div class="file-upload" id="fileUpload" onclick="document.getElementById('csvFile').click()">
+                            <p>📁 Click to upload CSV file or drag and drop</p>
+                            <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="handleFileUpload(event)">
+                        </div>
+                        <div class="result-area" id="fileResult"></div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>🤖 Model Training</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="input-group">
+                                    <label>Model Type:</label>
+                                    <select id="modelType">
+                                        <option value="linear">Linear Regression</option>
+                                        <option value="random_forest">Random Forest</option>
+                                        <option value="decision_tree">Decision Tree</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Target Column:</label>
+                                    <select id="targetColumn"></select>
+                                </div>
+                                <button class="btn" onclick="trainModel()">🤖 Train Model</button>
+                            </div>
+                            <div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="trainingProgress" style="width: 0%"></div>
+                                </div>
+                                <div class="result-area" id="trainingResult"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📈 Predictions</h3>
+                        <div class="input-group">
+                            <label>Input Data (JSON format):</label>
+                            <textarea id="predictionInput" rows="4" placeholder='{"feature1": 1.5, "feature2": 2.3}'></textarea>
+                        </div>
+                        <button class="btn" onclick="makePrediction()">🔮 Make Prediction</button>
+                        <div class="result-area" id="predictionResult"></div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📊 Data Visualization</h3>
+                        <div class="grid-3">
+                            <button class="btn" onclick="generateChart('scatter')">📈 Scatter Plot</button>
+                            <button class="btn" onclick="generateChart('line')">📉 Line Chart</button>
+                            <button class="btn" onclick="generateChart('bar')">📊 Bar Chart</button>
+                        </div>
+                        <div class="result-area" id="chartResult">
+                            <canvas id="chartCanvas" width="600" height="400"></canvas>
+                        </div>
+                    </div>
+                `
+            },
+            prompt: {
+                title: "Prompt Engineering",
+                content: `
+                    <div class="tool-section">
+                        <h3>🎯 AI Model Selection</h3>
+                        <div class="input-group">
+                            <label>Select AI Model:</label>
+                            <select id="aiModel">
+                                <option value="gpt-4">GPT-4 (Most Capable)</option>
+                                <option value="gpt-3.5">GPT-3.5 Turbo (Fast & Cost-effective)</option>
+                                <option value="claude">Claude (Analytical)</option>
+                                <option value="gemini">Gemini (Creative)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Temperature (Creativity):</label>
+                            <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7">
+                            <span id="tempValue">0.7</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📝 Prompt Templates</h3>
+                        <div class="input-group">
+                            <label>Select Template:</label>
+                            <select id="promptTemplate" onchange="loadTemplate()">
+                                <option value="">Choose a template...</option>
+                                <option value="code">Code Generation</option>
+                                <option value="analysis">Data Analysis</option>
+                                <option value="creative">Creative Writing</option>
+                                <option value="translation">Translation</option>
+                                <option value="summary">Text Summary</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Your Prompt:</label>
+                            <textarea id="promptInput" rows="6" placeholder="Enter your prompt here..."></textarea>
+                        </div>
+                        <button class="btn" onclick="generateResponse()">🤖 Generate Response</button>
+                        <div class="result-area" id="promptResult"></div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>🔧 Prompt Optimization</h3>
+                        <div class="input-group">
+                            <label>Original Prompt:</label>
+                            <textarea id="originalPrompt" rows="3" placeholder="Enter your original prompt..."></textarea>
+                        </div>
+                        <button class="btn" onclick="optimizePrompt()">🔧 Optimize Prompt</button>
+                        <div class="result-area" id="optimizedPrompt"></div>
+                    </div>
+                `
+            },
+            linux: {
+                title: "Linux Management",
+                content: `
+                    <div class="tool-section">
+                        <h3>🔐 SSH Connection</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="input-group">
+                                    <label>Host:</label>
+                                    <input type="text" id="sshHost" placeholder="192.168.1.100">
+                                </div>
+                                <div class="input-group">
+                                    <label>Username:</label>
+                                    <input type="text" id="sshUser" placeholder="ubuntu">
+                                </div>
+                                <div class="input-group">
+                                    <label>Password:</label>
+                                    <input type="password" id="sshPass" placeholder="password">
+                                </div>
+                                <button class="btn" onclick="connectSSH()">🔗 Connect</button>
+                                <button class="btn btn-danger" onclick="disconnectSSH()">❌ Disconnect</button>
+                            </div>
+                            <div>
+                                <div class="result-area" id="sshStatus">Not connected</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>💻 Terminal</h3>
+                        <div class="terminal" id="terminal">
+                            <div id="terminalOutput">
+                                <div>Welcome to Linux Terminal Simulator</div>
+                                <div>Type 'help' for available commands</div>
+                                <div id="terminalPrompt">$ <input type="text" class="terminal-input" id="terminalInput" onkeypress="handleTerminalInput(event)"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>🎤 Voice Commands</h3>
+                        <div class="input-group">
+                            <label>Voice Command:</label>
+                            <input type="text" id="voiceCommand" placeholder="ls -la" readonly>
+                        </div>
+                        <button class="btn" onclick="startVoiceRecognition()">🎤 Start Voice Recognition</button>
+                        <button class="btn btn-secondary" onclick="stopVoiceRecognition()">⏹️ Stop</button>
+                        <div class="result-area" id="voiceResult"></div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📊 System Monitoring</h3>
+                        <div class="grid-3">
+                            <div class="feature-card">
+                                <h4>CPU Usage</h4>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="cpuUsage" style="width: 45%"></div>
+                                </div>
+                                <span id="cpuText">45%</span>
+                            </div>
+                            <div class="feature-card">
+                                <h4>Memory Usage</h4>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="memoryUsage" style="width: 62%"></div>
+                                </div>
+                                <span id="memoryText">62%</span>
+                            </div>
+                            <div class="feature-card">
+                                <h4>Disk Usage</h4>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="diskUsage" style="width: 78%"></div>
+                                </div>
+                                <span id="diskText">78%</span>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="refreshSystemStats()">🔄 Refresh Stats</button>
+                    </div>
+                `
+            },
+            docker: {
+                title: "Docker Management",
+                content: `
+                    <div class="tool-section">
+                        <h3>🐳 Container Management</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="input-group">
+                                    <label>Container Name:</label>
+                                    <input type="text" id="containerName" placeholder="my-app">
+                                </div>
+                                <div class="input-group">
+                                    <label>Image:</label>
+                                    <input type="text" id="dockerImage" placeholder="nginx:latest">
+                                </div>
+                                <div class="input-group">
+                                    <label>Port Mapping:</label>
+                                    <input type="text" id="portMapping" placeholder="8080:80">
+                                </div>
+                                <button class="btn" onclick="runContainer()">🚀 Run Container</button>
+                                <button class="btn btn-danger" onclick="stopContainer()">⏹️ Stop Container</button>
+                            </div>
+                            <div>
+                                <div class="result-area" id="dockerStatus">No containers running</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📋 Container List</h3>
+                        <button class="btn" onclick="listContainers()">📋 List Containers</button>
+                        <button class="btn" onclick="listImages()">🖼️ List Images</button>
+                        <div class="result-area" id="containerList">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid #ddd; padding: 8px;">Container ID</th>
+                                        <th style="border: 1px solid #ddd; padding: 8px;">Image</th>
+                                        <th style="border: 1px solid #ddd; padding: 8px;">Status</th>
+                                        <th style="border: 1px solid #ddd; padding: 8px;">Ports</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="containerTableBody">
+                                    <tr><td colspan="4" style="text-align: center; padding: 16px;">No containers found</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>🔧 Docker Compose</h3>
+                        <div class="input-group">
+                            <label>Compose File (YAML):</label>
+                            <textarea id="composeFile" rows="10" placeholder="version: '3'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - '8080:80'
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password"></textarea>
+                        </div>
+                        <button class="btn" onclick="deployCompose()">🚀 Deploy Stack</button>
+                        <button class="btn btn-secondary" onclick="stopCompose()">⏹️ Stop Stack</button>
+                        <div class="result-area" id="composeResult"></div>
+                    </div>
+                `
+            },
+            aws: {
+                title: "AWS Cloud Services",
+                content: `
+                    <div class="tool-section">
+                        <h3>☁️ EC2 Instance Management</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="input-group">
+                                    <label>Instance Name:</label>
+                                    <input type="text" id="instanceName" placeholder="my-server">
+                                </div>
+                                <div class="input-group">
+                                    <label>Instance Type:</label>
+                                    <select id="instanceType">
+                                        <option value="t2.micro">t2.micro (Free Tier)</option>
+                                        <option value="t2.small">t2.small</option>
+                                        <option value="t2.medium">t2.medium</option>
+                                        <option value="t3.large">t3.large</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>AMI:</label>
+                                    <select id="amiType">
+                                        <option value="ami-12345678">Amazon Linux 2</option>
+                                        <option value="ami-87654321">Ubuntu 20.04</option>
+                                        <option value="ami-11223344">Windows Server 2019</option>
+                                    </select>
+                                </div>
+                                <button class="btn" onclick="launchInstance()">🚀 Launch Instance</button>
+                                <button class="btn btn-danger" onclick="terminateInstance()">💥 Terminate Instance</button>
+                            </div>
+                            <div>
+                                <div class="result-area" id="ec2Status">No instances running</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>🗄️ Database Services</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="input-group">
+                                    <label>Database Type:</label>
+                                    <select id="dbType">
+                                        <option value="rds-mysql">RDS MySQL</option>
+                                        <option value="rds-postgresql">RDS PostgreSQL</option>
+                                        <option value="dynamodb">DynamoDB</option>
+                                        <option value="aurora">Aurora</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Database Name:</label>
+                                    <input type="text" id="dbName" placeholder="myapp-db">
+                                </div>
+                                <div class="input-group">
+                                    <label>Username:</label>
+                                    <input type="text" id="dbUser" placeholder="admin">
+                                </div>
+                                <button class="btn" onclick="createDatabase()">🗄️ Create Database</button>
+                                <button class="btn btn-secondary" onclick="listDatabases()">📋 List Databases</button>
+                            </div>
+                            <div>
+                                <div class="result-area" id="dbStatus"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📊 AWS Monitoring</h3>
+                        <div class="grid-3">
+                            <div class="feature-card">
+                                <h4>EC2 Instances</h4>
+                                <div style="font-size: 24px; font-weight: bold; color: #4caf50;" id="ec2Count">0</div>
+                                <p>Running instances</p>
+                            </div>
+                            <div class="feature-card">
+                                <h4>Databases</h4>
+                                <div style="font-size: 24px; font-weight: bold; color: #2196f3;" id="dbCount">0</div>
+                                <p>Active databases</p>
+                            </div>
+                            <div class="feature-card">
+                                <h4>Monthly Cost</h4>
+                                <div style="font-size: 24px; font-weight: bold; color: #ff9800;" id="monthlyCost">$0.00</div>
+                                <p>Estimated cost</p>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="refreshAWSStats()">🔄 Refresh Stats</button>
+                    </div>
+                `
+            },
+            kubernetes: {
+                title: "Kubernetes Orchestration",
+                content: `
+                    <div class="tool-section">
+                        <h3>🪄 Cluster Management</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="input-group">
+                                    <label>Cluster Name:</label>
+                                    <input type="text" id="clusterName" placeholder="my-cluster">
+                                </div>
+                                <div class="input-group">
+                                    <label>Cluster Type:</label>
+                                    <select id="clusterType">
+                                        <option value="eks">Amazon EKS</option>
+                                        <option value="gke">Google GKE</option>
+                                        <option value="aks">Azure AKS</option>
+                                        <option value="minikube">Minikube (Local)</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Node Count:</label>
+                                    <input type="number" id="nodeCount" value="3" min="1" max="10">
+                                </div>
+                                <button class="btn" onclick="createCluster()">🚀 Create Cluster</button>
+                                <button class="btn btn-danger" onclick="deleteCluster()">🗑️ Delete Cluster</button>
+                            </div>
+                            <div>
+                                <div class="result-area" id="clusterStatus">No clusters available</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📦 Pod Deployment</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="input-group">
+                                    <label>Deployment Name:</label>
+                                    <input type="text" id="deploymentName" placeholder="my-app">
+                                </div>
+                                <div class="input-group">
+                                    <label>Image:</label>
+                                    <input type="text" id="podImage" placeholder="nginx:latest">
+                                </div>
+                                <div class="input-group">
+                                    <label>Replicas:</label>
+                                    <input type="number" id="replicas" value="3" min="1" max="10">
+                                </div>
+                                <div class="input-group">
+                                    <label>Port:</label>
+                                    <input type="number" id="podPort" value="80" min="1" max="65535">
+                                </div>
+                                <button class="btn" onclick="deployPod()">📦 Deploy Pod</button>
+                                <button class="btn btn-secondary" onclick="scaleDeployment()">📈 Scale Deployment</button>
+                            </div>
+                            <div>
+                                <div class="result-area" id="deploymentStatus"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📊 Cluster Monitoring</h3>
+                        <div class="grid-3">
+                            <div class="feature-card">
+                                <h4>Nodes</h4>
+                                <div style="font-size: 24px; font-weight: bold; color: #4caf50;" id="nodeCount">0</div>
+                                <p>Active nodes</p>
+                            </div>
+                            <div class="feature-card">
+                                <h4>Pods</h4>
+                                <div style="font-size: 24px; font-weight: bold; color: #2196f3;" id="podCount">0</div>
+                                <p>Running pods</p>
+                            </div>
+                            <div class="feature-card">
+                                <h4>Services</h4>
+                                <div style="font-size: 24px; font-weight: bold; color: #ff9800;" id="serviceCount">0</div>
+                                <p>Active services</p>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="getClusterInfo()">📋 Get Cluster Info</button>
+                        <div class="result-area" id="clusterInfo"></div>
+                    </div>
+                `
+            },
+            "agentic-ai": {
+                title: "Agentic AI",
+                content: `
+                    <div class="tool-section">
+                        <h3>🧞 AI Agent Creation</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="input-group">
+                                    <label>Agent Name:</label>
+                                    <input type="text" id="agentName" placeholder="Data Analyst Agent">
+                                </div>
+                                <div class="input-group">
+                                    <label>Agent Type:</label>
+                                    <select id="agentType">
+                                        <option value="data-analyst">Data Analyst</option>
+                                        <option value="code-reviewer">Code Reviewer</option>
+                                        <option value="content-writer">Content Writer</option>
+                                        <option value="customer-support">Customer Support</option>
+                                        <option value="research-assistant">Research Assistant</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Capabilities:</label>
+                                    <textarea id="agentCapabilities" rows="3" placeholder="Describe what this agent can do..."></textarea>
+                                </div>
+                                <button class="btn" onclick="createAgent()">🧞 Create Agent</button>
+                                <button class="btn btn-danger" onclick="deleteAgent()">🗑️ Delete Agent</button>
+                            </div>
+                            <div>
+                                <div class="result-area" id="agentStatus">No agents created</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>🤖 Task Automation</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="input-group">
+                                    <label>Select Agent:</label>
+                                    <select id="selectedAgent">
+                                        <option value="">Choose an agent...</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Task Description:</label>
+                                    <textarea id="taskDescription" rows="4" placeholder="Describe the task you want the agent to perform..."></textarea>
+                                </div>
+                                <div class="input-group">
+                                    <label>Priority:</label>
+                                    <select id="taskPriority">
+                                        <option value="low">Low</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="urgent">Urgent</option>
+                                    </select>
+                                </div>
+                                <button class="btn" onclick="assignTask()">📋 Assign Task</button>
+                                <button class="btn btn-secondary" onclick="monitorTasks()">👁️ Monitor Tasks</button>
+                            </div>
+                            <div>
+                                <div class="result-area" id="taskStatus"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📊 Agent Performance</h3>
+                        <div class="grid-3">
+                            <div class="feature-card">
+                                <h4>Active Agents</h4>
+                                <div style="font-size: 24px; font-weight: bold; color: #4caf50;" id="activeAgents">0</div>
+                                <p>Currently running</p>
+                            </div>
+                            <div class="feature-card">
+                                <h4>Tasks Completed</h4>
+                                <div style="font-size: 24px; font-weight: bold; color: #2196f3;" id="completedTasks">0</div>
+                                <p>This week</p>
+                            </div>
+                            <div class="feature-card">
+                                <h4>Success Rate</h4>
+                                <div style="font-size: 24px; font-weight: bold; color: #ff9800;" id="successRate">0%</div>
+                                <p>Task completion</p>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="generateReport()">📈 Generate Report</button>
+                        <div class="result-area" id="agentReport"></div>
+                    </div>
+                `
+            },
+            files: {
+                title: "File Management",
+                content: `
+                    <div class="tool-section">
+                        <h3>📁 File Upload & Storage</h3>
+                        <div class="file-upload" id="fileUploadArea" onclick="document.getElementById('fileInput').click()">
+                            <p>📁 Click to upload files or drag and drop</p>
+                            <p style="font-size: 12px; color: #666;">Supports: Images, Documents, Videos, Archives</p>
+                            <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileUpload(event)">
+                        </div>
+                        <div class="result-area" id="uploadResult"></div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>🔍 File Search & Filter</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="input-group">
+                                    <label>Search Files:</label>
+                                    <input type="text" id="fileSearch" placeholder="Enter filename or extension...">
+                                </div>
+                                <div class="input-group">
+                                    <label>File Type:</label>
+                                    <select id="fileTypeFilter">
+                                        <option value="">All Types</option>
+                                        <option value="image">Images</option>
+                                        <option value="document">Documents</option>
+                                        <option value="video">Videos</option>
+                                        <option value="archive">Archives</option>
+                                    </select>
+                                </div>
+                                <button class="btn" onclick="searchFiles()">🔍 Search</button>
+                                <button class="btn btn-secondary" onclick="clearSearch()">🗑️ Clear</button>
+                            </div>
+                            <div>
+                                <div class="result-area" id="searchResult"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📊 File Browser</h3>
+                        <div class="result-area" id="fileBrowser">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid #ddd; padding: 8px;">📁 Name</th>
+                                        <th style="border: 1px solid #ddd; padding: 8px;">📏 Size</th>
+                                        <th style="border: 1px solid #ddd; padding: 8px;">📅 Modified</th>
+                                        <th style="border: 1px solid #ddd; padding: 8px;">🔧 Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fileTableBody">
+                                    <tr><td colspan="4" style="text-align: center; padding: 16px;">No files uploaded yet</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button class="btn" onclick="refreshFileList()">🔄 Refresh List</button>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📈 Storage Analytics</h3>
+                        <div class="grid-3">
+                            <div class="feature-card">
+                                <h4>Total Files</h4>
+                                <div style="font-size: 24px; font-weight: bold; color: #4caf50;" id="totalFiles">0</div>
+                                <p>Files stored</p>
+                            </div>
+                            <div class="feature-card">
+                                <h4>Storage Used</h4>
+                                <div style="font-size: 24px; font-weight: bold; color: #2196f3;" id="storageUsed">0 MB</div>
+                                <p>Space occupied</p>
+                            </div>
+                            <div class="feature-card">
+                                <h4>File Types</h4>
+                                <div style="font-size: 24px; font-weight: bold; color: #ff9800;" id="fileTypes">0</div>
+                                <p>Different types</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            windows: {
+                title: "Windows Management",
+                content: `
+                    <div class="tool-section">
+                        <h3>🪟 System Information</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="input-group">
+                                    <label>System Scan:</label>
+                                    <select id="scanType">
+                                        <option value="basic">Basic System Info</option>
+                                        <option value="detailed">Detailed System Report</option>
+                                        <option value="performance">Performance Analysis</option>
+                                        <option value="security">Security Check</option>
+                                    </select>
+                                </div>
+                                <button class="btn" onclick="scanSystem()">🔍 Scan System</button>
+                                <button class="btn btn-secondary" onclick="exportReport()">📄 Export Report</button>
+                            </div>
+                            <div>
+                                <div class="result-area" id="systemInfo"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>⚙️ PowerShell Terminal</h3>
+                        <div class="terminal" id="powershellTerminal">
+                            <div id="powershellOutput">
+                                <div>Windows PowerShell</div>
+                                <div>Copyright (C) Microsoft Corporation. All rights reserved.</div>
+                                <div id="powershellPrompt">PS C:\\Users\\Admin> <input type="text" class="terminal-input" id="powershellInput" onkeypress="handlePowerShellInput(event)"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>🔧 System Services</h3>
+                        <div class="grid-2">
+                            <div>
+                                <div class="input-group">
+                                    <label>Service Name:</label>
+                                    <select id="serviceName">
+                                        <option value="spooler">Print Spooler</option>
+                                        <option value="bits">Background Intelligent Transfer Service</option>
+                                        <option value="wuauserv">Windows Update</option>
+                                        <option value="themes">Themes</option>
+                                        <option value="wsearch">Windows Search</option>
+                                    </select>
+                                </div>
+                                <button class="btn" onclick="startService()">▶️ Start Service</button>
+                                <button class="btn btn-danger" onclick="stopService()">⏹️ Stop Service</button>
+                                <button class="btn btn-secondary" onclick="restartService()">🔄 Restart Service</button>
+                            </div>
+                            <div>
+                                <div class="result-area" id="serviceStatus"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>📊 System Performance</h3>
+                        <div class="grid-3">
+                            <div class="feature-card">
+                                <h4>CPU Usage</h4>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="winCpuUsage" style="width: 35%"></div>
+                                </div>
+                                <span id="winCpuText">35%</span>
+                            </div>
+                            <div class="feature-card">
+                                <h4>Memory Usage</h4>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="winMemoryUsage" style="width: 58%"></div>
+                                </div>
+                                <span id="winMemoryText">58%</span>
+                            </div>
+                            <div class="feature-card">
+                                <h4>Disk Usage</h4>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="winDiskUsage" style="width: 72%"></div>
+                                </div>
+                                <span id="winDiskText">72%</span>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="refreshWindowsStats()">🔄 Refresh Stats</button>
+                    </div>
+                `
+            }
+        };
+
+        // App functionality
+        class MenuBaseApp {
+            constructor() {
+                this.currentPage = 'home';
+                this.isDarkMode = false;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.loadPage('home');
+                this.loadTheme();
+            }
+
+            bindEvents() {
+                // Menu item clicks
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        const page = e.currentTarget.dataset.page;
+                        this.loadPage(page);
+                        this.updateActiveMenu(page);
+                    });
+                });
+
+                // Theme toggle
+                document.getElementById('themeToggle').addEventListener('click', () => {
+                    this.toggleTheme();
+                });
+
+                // Mobile menu toggle
+                document.getElementById('mobileMenuToggle').addEventListener('click', () => {
+                    this.toggleMobileMenu();
+                });
+            }
+
+            loadPage(page) {
+                this.currentPage = page;
+                const content = pageContent[page];
+                const contentArea = document.getElementById('contentArea');
+
+                if (page === 'home') {
+                    contentArea.innerHTML = this.renderHomePage(content);
+                } else {
+                    contentArea.innerHTML = `
+                        <h2 style="margin-bottom: 24px; font-size: 2rem; font-weight: 500;">${content.title}</h2>
+                        ${content.content}
+                    `;
+                }
+
+                this.showToast(`Loaded ${content.title}`, 'info');
+            }
+
+            renderHomePage(content) {
+                const featuresHtml = content.features.map(feature => `
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <span class="feature-icon">${feature.icon}</span>
+                            <h3 class="feature-title">${feature.title}</h3>
+                        </div>
+                        <p class="feature-description">${feature.description}</p>
+                    </div>
+                `).join('');
+
+                const chipsHtml = content.chips.map(chip => `
+                    <div class="chip">
+                        <span>${chip.icon}</span>
+                        ${chip.label}
+                    </div>
+                `).join('');
+
+                return `
+                    <h2 style="margin-bottom: 24px; font-size: 2rem; font-weight: 500;">${content.title}</h2>
+                    <p style="margin-bottom: 24px; font-size: 1.2rem; color: #666;">${content.subtitle}</p>
+                    
+                    <div class="feature-grid">
+                        ${featuresHtml}
+                    </div>
+                    
+                    <div style="margin-top: 32px;">
+                        <h3 style="margin-bottom: 16px;">🎯 Quick Access</h3>
+                        <div class="chip-container">
+                            ${chipsHtml}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 48px; text-align: center;">
+                        <p style="color: #666; font-size: 0.9rem;"></p>
+                    </div>
+                `;
+            }
+
+            updateActiveMenu(page) {
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[data-page="${page}"]`).classList.add('active');
+            }
+
+            toggleTheme() {
+                this.isDarkMode = !this.isDarkMode;
+                document.body.classList.toggle('dark-mode', this.isDarkMode);
+                
+                const themeIcon = document.querySelector('#themeToggle i');
+                themeIcon.textContent = this.isDarkMode ? 'brightness_7' : 'brightness_4';
+                
+                localStorage.setItem('darkMode', this.isDarkMode);
+                this.showToast(`Switched to ${this.isDarkMode ? 'dark' : 'light'} mode`, 'info');
+            }
+
+            loadTheme() {
+                const savedTheme = localStorage.getItem('darkMode');
+                if (savedTheme === 'true') {
+                    this.isDarkMode = true;
+                    document.body.classList.add('dark-mode');
+                    document.querySelector('#themeToggle i').textContent = 'brightness_7';
+                }
+            }
+
+            toggleMobileMenu() {
+                document.getElementById('sidebar').classList.toggle('open');
+            }
+
+            showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+
+                setTimeout(() => toast.classList.add('show'), 100);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => document.body.removeChild(toast), 300);
+                }, 3000);
+            }
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            new MenuBaseApp();
+            initializeTools();
+        });
+
+        // Global variables for tools
+        let currentModel = null;
+        let uploadedData = null;
+        let cameraStream = null;
+        let speechSynthesis = window.speechSynthesis;
+
+        // Initialize all tools
+        function initializeTools() {
+            // Initialize text-to-speech voices
+            if (speechSynthesis) {
+                speechSynthesis.onvoiceschanged = () => {
+                    const voices = speechSynthesis.getVoices();
+                    const voiceSelect = document.getElementById('ttsVoice');
+                    if (voiceSelect) {
+                        voiceSelect.innerHTML = '';
+                        voices.forEach(voice => {
+                            const option = document.createElement('option');
+                            option.value = voice.name;
+                            option.textContent = `${voice.name} (${voice.lang})`;
+                            voiceSelect.appendChild(option);
+                        });
+                    }
+                };
+            }
+
+            // Initialize file upload drag and drop
+            const fileUpload = document.getElementById('fileUpload');
+            if (fileUpload) {
+                fileUpload.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    fileUpload.classList.add('dragover');
+                });
+                fileUpload.addEventListener('dragleave', () => {
+                    fileUpload.classList.remove('dragover');
+                });
+                fileUpload.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    fileUpload.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        handleFileUpload({ target: { files } });
+                    }
+                });
+            }
+        }
+
+        // Python Section Functions
+        function sendWhatsApp() {
+            const phone = document.getElementById('whatsappPhone').value;
+            const message = document.getElementById('whatsappMessage').value;
+            const result = document.getElementById('whatsappResult');
+
+            if (!phone || !message) {
+                result.innerHTML = '<p style="color: #f44336;">Please fill in all fields</p>';
+                return;
+            }
+
+            // Simulate WhatsApp API call
+            result.innerHTML = '<p>📱 Sending WhatsApp message...</p>';
+            setTimeout(() => {
+                result.innerHTML = `
+                    <p style="color: #4caf50;">✅ Message sent successfully!</p>
+                    <p><strong>To:</strong> ${phone}</p>
+                    <p><strong>Message:</strong> ${message}</p>
+                    <p><em>Note: This is a simulation. In a real app, you would integrate with WhatsApp Business API.</em></p>
+                `;
+            }, 2000);
+        }
+
+        function sendEmail() {
+            const to = document.getElementById('emailTo').value;
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            const result = document.getElementById('emailResult');
+
+            if (!to || !subject || !body) {
+                result.innerHTML = '<p style="color: #f44336;">Please fill in all fields</p>';
+                return;
+            }
+
+            result.innerHTML = '<p>📧 Sending email...</p>';
+            setTimeout(() => {
+                result.innerHTML = `
+                    <p style="color: #4caf50;">✅ Email sent successfully!</p>
+                    <p><strong>To:</strong> ${to}</p>
+                    <p><strong>Subject:</strong> ${subject}</p>
+                    <p><strong>Body:</strong> ${body}</p>
+                    <p><em>Note: This is a simulation. In a real app, you would integrate with an email service.</em></p>
+                `;
+            }, 2000);
+        }
+
+        function generateCode() {
+            const prompt = document.getElementById('aiPrompt').value;
+            const result = document.getElementById('generatedCode');
+
+            if (!prompt) {
+                result.innerHTML = '<p style="color: #f44336;">Please enter a description</p>';
+                return;
+            }
+
+            result.innerHTML = '<p>🤖 Generating code...</p>';
+            setTimeout(() => {
+                const sampleCode = `# Generated Python code based on: "${prompt}"
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+
+# Sample implementation
+def process_data():
+    """Process and analyze data based on your requirements"""
+    data = pd.DataFrame({
+        'feature1': np.random.randn(100),
+        'feature2': np.random.randn(100),
+        'target': np.random.randn(100)
+    })
+    
+    # Split data
+    X = data[['feature1', 'feature2']]
+    y = data['target']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    
+    # Train model
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+    
+    # Make predictions
+    predictions = model.predict(X_test)
+    
+    return model, predictions
+
+# Usage
+if __name__ == "__main__":
+    model, predictions = process_data()
+    print("Model trained successfully!")
+    print(f"Predictions shape: {predictions.shape}")`;
+                
+                result.innerHTML = `<pre><code>${sampleCode}</code></pre>`;
+            }, 1500);
+        }
+
+        // HTML/JS Section Functions
+        function startCamera() {
+            const video = document.getElementById('camera');
+            const controls = document.getElementById('cameraControls');
+            const result = document.getElementById('cameraResult');
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    cameraStream = stream;
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    controls.querySelector('button:nth-child(2)').style.display = 'inline-block';
+                    controls.querySelector('button:nth-child(3)').style.display = 'inline-block';
+                    result.innerHTML = '<p style="color: #4caf50;">✅ Camera started successfully!</p>';
+                })
+                .catch(err => {
+                    result.innerHTML = `<p style="color: #f44336;">❌ Error: ${err.message}</p>`;
+                });
+        }
+
+        function takePhoto() {
+            const video = document.getElementById('camera');
+            const canvas = document.getElementById('canvas');
+            const result = document.getElementById('cameraResult');
+            const ctx = canvas.getContext('2d');
+
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/png');
+            
+            result.innerHTML = `
+                <p style="color: #4caf50;">📸 Photo captured!</p>
+                <img src="${imageData}" style="max-width: 100%; border-radius: 8px;">
+                <br><br>
+                <button class="btn" onclick="downloadPhoto('${imageData}')">💾 Download Photo</button>
+            `;
+        }
+
+        function downloadPhoto(imageData) {
+            const link = document.createElement('a');
+            link.download = 'captured-photo.png';
+            link.href = imageData;
+            link.click();
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            const video = document.getElementById('camera');
+            const controls = document.getElementById('cameraControls');
+            video.style.display = 'none';
+            controls.querySelector('button:nth-child(2)').style.display = 'none';
+            controls.querySelector('button:nth-child(3)').style.display = 'none';
+            document.getElementById('cameraResult').innerHTML = '<p>Camera stopped</p>';
+        }
+
+        function getLocation() {
+            const result = document.getElementById('locationResult');
+            
+            if (!navigator.geolocation) {
+                result.innerHTML = '<p style="color: #f44336;">Geolocation is not supported by this browser</p>';
+                return;
+            }
+
+            result.innerHTML = '<p>📍 Getting location...</p>';
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const { latitude, longitude } = position.coords;
+                    result.innerHTML = `
+                        <p style="color: #4caf50;">✅ Location obtained!</p>
+                        <p><strong>Latitude:</strong> ${latitude}</p>
+                        <p><strong>Longitude:</strong> ${longitude}</p>
+                        <p><strong>Accuracy:</strong> ${position.coords.accuracy} meters</p>
+                        <a href="https://www.google.com/maps?q=${latitude},${longitude}" target="_blank" class="btn">🗺️ View on Google Maps</a>
+                    `;
+                },
+                error => {
+                    result.innerHTML = `<p style="color: #f44336;">❌ Error: ${error.message}</p>`;
+                }
+            );
+        }
+
+        function speakText() {
+            const text = document.getElementById('ttsText').value;
+            const voiceSelect = document.getElementById('ttsVoice');
+            
+            if (!text) {
+                alert('Please enter text to speak');
+                return;
+            }
+
+            if (speechSynthesis) {
+                speechSynthesis.cancel(); // Stop any current speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                if (voiceSelect.value) {
+                    const voices = speechSynthesis.getVoices();
+                    const selectedVoice = voices.find(voice => voice.name === voiceSelect.value);
+                    if (selectedVoice) utterance.voice = selectedVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function stopSpeaking() {
+            if (speechSynthesis) {
+                speechSynthesis.cancel();
+            }
+        }
+
+        function calculate() {
+            const expression = document.getElementById('calculator').value;
+            const result = document.getElementById('calcResult');
+            
+            try {
+                // Safe evaluation (only basic math operations)
+                const sanitized = expression.replace(/[^0-9+\-*/().]/g, '');
+                const answer = eval(sanitized);
+                result.innerHTML = `
+                    <p style="color: #4caf50;">✅ Calculation result:</p>
+                    <p style="font-size: 24px; font-weight: bold;">${expression} = ${answer}</p>
+                `;
+            } catch (error) {
+                result.innerHTML = `<p style="color: #f44336;">❌ Invalid expression: ${error.message}</p>`;
+            }
+        }
+
+        // Machine Learning Section Functions
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            const result = document.getElementById('fileResult');
+            
+            if (!file) return;
+            
+            if (!file.name.endsWith('.csv')) {
+                result.innerHTML = '<p style="color: #f44336;">Please upload a CSV file</p>';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                const lines = csv.split('\n');
+                const headers = lines[0].split(',');
+                const data = lines.slice(1).filter(line => line.trim()).map(line => {
+                    const values = line.split(',');
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header.trim()] = values[index] ? values[index].trim() : '';
+                    });
+                    return row;
+                });
+
+                uploadedData = { headers, data };
+                
+                // Populate target column dropdown
+                const targetSelect = document.getElementById('targetColumn');
+                targetSelect.innerHTML = '';
+                headers.forEach(header => {
+                    const option = document.createElement('option');
+                    option.value = header.trim();
+                    option.textContent = header.trim();
+                    targetSelect.appendChild(option);
+                });
+
+                result.innerHTML = `
+                    <p style="color: #4caf50;">✅ File uploaded successfully!</p>
+                    <p><strong>File:</strong> ${file.name}</p>
+                    <p><strong>Rows:</strong> ${data.length}</p>
+                    <p><strong>Columns:</strong> ${headers.join(', ')}</p>
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr>${headers.map(h => `<th style="border: 1px solid #ddd; padding: 8px;">${h}</th>`).join('')}</tr>
+                            </thead>
+                            <tbody>
+                                ${data.slice(0, 5).map(row => 
+                                    `<tr>${headers.map(h => `<td style="border: 1px solid #ddd; padding: 8px;">${row[h]}</td>`).join('')}</tr>`
+                                ).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            };
+            reader.readAsText(file);
+        }
+
+        function trainModel() {
+            if (!uploadedData) {
+                alert('Please upload a CSV file first');
+                return;
+            }
+
+            const modelType = document.getElementById('modelType').value;
+            const targetCol = document.getElementById('targetColumn').value;
+            const progress = document.getElementById('trainingProgress');
+            const result = document.getElementById('trainingResult');
+
+            result.innerHTML = '<p>🤖 Training model...</p>';
+            
+            // Simulate training progress
+            let progressValue = 0;
+            const interval = setInterval(() => {
+                progressValue += 10;
+                progress.style.width = progressValue + '%';
+                
+                if (progressValue >= 100) {
+                    clearInterval(interval);
+                    currentModel = {
+                        type: modelType,
+                        target: targetCol,
+                        accuracy: (Math.random() * 0.3 + 0.7).toFixed(3), // Random accuracy between 70-100%
+                        trained: true
+                    };
+                    
+                    result.innerHTML = `
+                        <p style="color: #4caf50;">✅ Model trained successfully!</p>
+                        <p><strong>Model Type:</strong> ${modelType}</p>
+                        <p><strong>Target Column:</strong> ${targetCol}</p>
+                        <p><strong>Accuracy:</strong> ${currentModel.accuracy}</p>
+                        <p><em>Note: This is a simulation. In a real app, you would use actual ML libraries.</em></p>
+                    `;
+                }
+            }, 200);
+        }
+
+        function makePrediction() {
+            if (!currentModel) {
+                alert('Please train a model first');
+                return;
+            }
+
+            const input = document.getElementById('predictionInput').value;
+            const result = document.getElementById('predictionResult');
+
+            try {
+                const data = JSON.parse(input);
+                const prediction = Math.random() * 100; // Simulate prediction
+                
+                result.innerHTML = `
+                    <p style="color: #4caf50;">🔮 Prediction made!</p>
+                    <p><strong>Input:</strong> ${JSON.stringify(data)}</p>
+                    <p><strong>Prediction:</strong> ${prediction.toFixed(2)}</p>
+                    <p><em>Note: This is a simulation. In a real app, you would use the trained model.</em></p>
+                `;
+            } catch (error) {
+                result.innerHTML = `<p style="color: #f44336;">❌ Invalid JSON format: ${error.message}</p>`;
+            }
+        }
+
+        function generateChart(type) {
+            const canvas = document.getElementById('chartCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Generate sample data
+            const data = Array.from({length: 10}, (_, i) => ({
+                x: i,
+                y: Math.random() * 100
+            }));
+
+            // Draw chart based on type
+            ctx.strokeStyle = '#1976d2';
+            ctx.lineWidth = 2;
+            ctx.fillStyle = '#1976d2';
+
+            if (type === 'scatter') {
+                data.forEach(point => {
+                    ctx.beginPath();
+                    ctx.arc(point.x * 50 + 50, canvas.height - point.y * 3 - 50, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+            } else if (type === 'line') {
+                ctx.beginPath();
+                data.forEach((point, i) => {
+                    const x = point.x * 50 + 50;
+                    const y = canvas.height - point.y * 3 - 50;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+            } else if (type === 'bar') {
+                data.forEach(point => {
+                    const x = point.x * 50 + 50;
+                    const height = point.y * 3;
+                    ctx.fillRect(x - 20, canvas.height - height - 50, 40, height);
+                });
+            }
+
+            // Add labels
+            ctx.fillStyle = '#333';
+            ctx.font = '16px Arial';
+            ctx.fillText(`${type.charAt(0).toUpperCase() + type.slice(1)} Chart`, 20, 30);
+        }
+
+        // Prompt Engineering Functions
+        function loadTemplate() {
+            const template = document.getElementById('promptTemplate').value;
+            const promptInput = document.getElementById('promptInput');
+            
+            const templates = {
+                code: `Write a Python function that:
+- Takes a list of numbers as input
+- Returns the sum of all even numbers
+- Handles edge cases properly
+- Includes proper documentation
+
+Example input: [1, 2, 3, 4, 5, 6]
+Expected output: 12 (2 + 4 + 6)`,
+                analysis: `Analyze the following dataset and provide insights:
+- Identify key trends and patterns
+- Suggest potential correlations
+- Highlight any anomalies or outliers
+- Provide actionable recommendations
+
+Dataset: [Your data here]`,
+                creative: `Write a creative story that includes:
+- A mysterious character
+- An unexpected plot twist
+- Vivid descriptions
+- Emotional depth
+- A satisfying conclusion
+
+Theme: [Your theme here]`,
+                translation: `Translate the following text to [target language]:
+- Maintain the original tone and style
+- Preserve cultural context where appropriate
+- Ensure accuracy and fluency
+
+Text: [Your text here]`,
+                summary: `Summarize the following text:
+- Extract key points and main ideas
+- Maintain the original meaning
+- Keep it concise but comprehensive
+- Use clear, professional language
+
+Text: [Your text here]`
+            };
+            
+            if (templates[template]) {
+                promptInput.value = templates[template];
+            }
+        }
+
+        function generateResponse() {
+            const prompt = document.getElementById('promptInput').value;
+            const model = document.getElementById('aiModel').value;
+            const temp = document.getElementById('temperature').value;
+            const result = document.getElementById('promptResult');
+            
+            if (!prompt) {
+                result.innerHTML = '<p style="color: #f44336;">Please enter a prompt</p>';
+                return;
+            }
+            
+            result.innerHTML = '<p>🤖 Generating response...</p>';
+            
+            setTimeout(() => {
+                const responses = {
+                    code: `def sum_even_numbers(numbers):
+    """
+    Calculate the sum of all even numbers in a list.
+    
+    Args:
+        numbers (list): List of integers
+        
+    Returns:
+        int: Sum of even numbers
+    """
+    return sum(num for num in numbers if num % 2 == 0)
+
+# Example usage
+test_list = [1, 2, 3, 4, 5, 6]
+result = sum_even_numbers(test_list)
+print(f"Sum of even numbers: {result}")  # Output: 12`,
+                    analysis: `Based on the dataset analysis:
+
+🔍 Key Trends:
+- Positive correlation between variables A and B
+- Seasonal patterns observed in quarterly data
+- Gradual increase in overall performance metrics
+
+📊 Insights:
+- 78% of data points fall within expected ranges
+- 3 outliers identified that may require investigation
+- Strong correlation (r=0.85) between primary indicators
+
+💡 Recommendations:
+- Implement monitoring for identified outliers
+- Consider seasonal adjustments in forecasting models
+- Focus on strengthening the A-B relationship for better outcomes`,
+                    creative: `The old bookstore on Maple Street held more than just dusty volumes. Sarah, the enigmatic proprietor, seemed to know every customer's deepest desires before they spoke them aloud.
+
+One rainy Tuesday, a young writer named Marcus entered, seeking inspiration for his stalled novel. Sarah handed him a leather-bound journal without a word, her silver eyes twinkling with ancient wisdom.
+
+As Marcus opened the journal, the pages began to glow with golden light. Words appeared before his eyes—not his own, but the story he'd been struggling to tell. The journal was writing itself, revealing the tale of a bookstore that granted literary wishes.
+
+The twist? Sarah wasn't just the owner—she was the bookstore itself, a centuries-old entity that had absorbed the dreams of countless writers. Marcus's story would be her final gift before she moved on to her next form.`,
+                    translation: `Translation completed successfully:
+
+Original: "The quick brown fox jumps over the lazy dog."
+
+Spanish: "El rápido zorro marrón salta sobre el perro perezoso."
+French: "Le rapide renard brun saute par-dessus le chien paresseux."
+German: "Der schnelle braune Fuchs springt über den faulen Hund."
+
+Note: Translation maintains the original meaning while adapting to each language's natural expression patterns.`,
+                    summary: `Summary:
+
+This comprehensive analysis examines the current market trends in the technology sector, focusing on three key areas: artificial intelligence adoption, cloud computing growth, and cybersecurity challenges.
+
+Key Points:
+• AI adoption has increased by 45% year-over-year
+• Cloud spending reached $400 billion globally in 2023
+• Cybersecurity incidents rose by 23%, requiring enhanced protection measures
+
+Main Conclusions:
+The technology sector continues rapid expansion with AI and cloud computing driving innovation, while cybersecurity remains a critical concern requiring immediate attention and investment.`
+                };
+                
+                const templateType = document.getElementById('promptTemplate').value;
+                const response = responses[templateType] || `AI Response (${model} model, temp: ${temp}):
+                
+Based on your prompt, here's a comprehensive response that addresses your requirements. The AI model has processed your input and generated relevant content that should meet your needs.
+
+This is a simulated response from the ${model} model with temperature setting ${temp}. In a real implementation, this would be an actual AI-generated response based on your specific prompt.`;
+                
+                result.innerHTML = `<pre style="white-space: pre-wrap;">${response}</pre>`;
+            }, 2000);
+        }
+
+        function optimizePrompt() {
+            const original = document.getElementById('originalPrompt').value;
+            const result = document.getElementById('optimizedPrompt');
+            
+            if (!original) {
+                result.innerHTML = '<p style="color: #f44336;">Please enter a prompt to optimize</p>';
+                return;
+            }
+            
+            result.innerHTML = '<p>🔧 Optimizing prompt...</p>';
+            
+            setTimeout(() => {
+                const optimized = `Optimized Prompt:
+
+${original}
+
+Additional Context:
+- Be specific and detailed in your response
+- Include relevant examples where appropriate
+- Provide step-by-step explanations if needed
+- Consider edge cases and potential issues
+- Use clear, professional language
+
+Expected Output Format:
+- Structured response with clear sections
+- Bullet points for key information
+- Code examples if applicable
+- Summary of main points
+
+This optimization improves clarity, specificity, and expected output format for better AI responses.`;
+                
+                result.innerHTML = `<pre style="white-space: pre-wrap;">${optimized}</pre>`;
+            }, 1500);
+        }
+
+        // Linux Management Functions
+        let sshConnected = false;
+        let voiceRecognition = null;
+        let terminalHistory = [];
+        let terminalHistoryIndex = 0;
+
+        function connectSSH() {
+            const host = document.getElementById('sshHost').value;
+            const user = document.getElementById('sshUser').value;
+            const pass = document.getElementById('sshPass').value;
+            const status = document.getElementById('sshStatus');
+            
+            if (!host || !user || !pass) {
+                status.innerHTML = '<p style="color: #f44336;">Please fill in all fields</p>';
+                return;
+            }
+            
+            status.innerHTML = '<p>🔗 Connecting to SSH...</p>';
+            
+            setTimeout(() => {
+                sshConnected = true;
+                status.innerHTML = `
+                    <p style="color: #4caf50;">✅ Connected to ${user}@${host}</p>
+                    <p><strong>Status:</strong> Active</p>
+                    <p><strong>Session ID:</strong> SSH-${Date.now()}</p>
+                `;
+                addTerminalOutput(`Connected to ${user}@${host}`);
+            }, 2000);
+        }
+
+        function disconnectSSH() {
+            sshConnected = false;
+            document.getElementById('sshStatus').innerHTML = '<p>Not connected</p>';
+            addTerminalOutput('Disconnected from SSH');
+        }
+
+        function addTerminalOutput(text) {
+            const output = document.getElementById('terminalOutput');
+            const prompt = document.getElementById('terminalPrompt');
+            
+            // Remove the current prompt
+            prompt.remove();
+            
+            // Add new output
+            const div = document.createElement('div');
+            div.textContent = text;
+            output.appendChild(div);
+            
+            // Add new prompt
+            const newPrompt = document.createElement('div');
+            newPrompt.id = 'terminalPrompt';
+            newPrompt.innerHTML = '$ <input type="text" class="terminal-input" id="terminalInput" onkeypress="handleTerminalInput(event)">';
+            output.appendChild(newPrompt);
+            
+            // Focus on new input
+            document.getElementById('terminalInput').focus();
+            
+            // Scroll to bottom
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function handleTerminalInput(event) {
+            if (event.key === 'Enter') {
+                const input = event.target;
+                const command = input.value.trim();
+                
+                if (command) {
+                    terminalHistory.push(command);
+                    terminalHistoryIndex = terminalHistory.length;
+                    
+                    addTerminalOutput(`$ ${command}`);
+                    executeCommand(command);
+                    input.value = '';
+                }
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                if (terminalHistoryIndex > 0) {
+                    terminalHistoryIndex--;
+                    input.value = terminalHistory[terminalHistoryIndex] || '';
+                }
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                if (terminalHistoryIndex < terminalHistory.length - 1) {
+                    terminalHistoryIndex++;
+                    input.value = terminalHistory[terminalHistoryIndex] || '';
+                } else {
+                    terminalHistoryIndex = terminalHistory.length;
+                    input.value = '';
+                }
+            }
+        }
+
+        function executeCommand(command) {
+            const commands = {
+                'help': `Available commands:
+- ls: List files and directories
+- pwd: Show current directory
+- whoami: Show current user
+- date: Show current date and time
+- echo [text]: Display text
+- clear: Clear terminal
+- help: Show this help message`,
+                'ls': `total 24
+drwxr-xr-x  2 user user 4096 Dec 15 10:30 .
+drwxr-xr-x  3 user user 4096 Dec 15 10:29 ..
+-rw-r--r--  1 user user  220 Dec 15 10:30 .bash_logout
+-rw-r--r--  1 user user 3771 Dec 15 10:30 .bashrc
+-rw-r--r--  1 user user  807 Dec 15 10:30 .profile
+-rw-r--r--  1 user user   25 Dec 15 10:30 test.txt`,
+                'pwd': '/home/user',
+                'whoami': 'user',
+                'date': new Date().toString(),
+                'clear': () => {
+                    document.getElementById('terminalOutput').innerHTML = `
+                        <div id="terminalPrompt">$ <input type="text" class="terminal-input" id="terminalInput" onkeypress="handleTerminalInput(event)"></div>
+                    `;
+                    document.getElementById('terminalInput').focus();
+                    return null;
+                }
+            };
+            
+            const response = commands[command] || `bash: ${command}: command not found`;
+            
+            if (typeof response === 'function') {
+                response();
+            } else if (response !== null) {
+                addTerminalOutput(response);
+            }
+        }
+
+        function startVoiceRecognition() {
+            const result = document.getElementById('voiceResult');
+            const commandInput = document.getElementById('voiceCommand');
+            
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                voiceRecognition = new SpeechRecognition();
+                voiceRecognition.continuous = false;
+                voiceRecognition.interimResults = false;
+                
+                voiceRecognition.onstart = () => {
+                    result.innerHTML = '<p style="color: #4caf50;">🎤 Listening... Speak now</p>';
+                };
+                
+                voiceRecognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    commandInput.value = transcript;
+                    result.innerHTML = `<p style="color: #4caf50;">✅ Recognized: "${transcript}"</p>`;
+                };
+                
+                voiceRecognition.onerror = (event) => {
+                    result.innerHTML = `<p style="color: #f44336;">❌ Error: ${event.error}</p>`;
+                };
+                
+                voiceRecognition.onend = () => {
+                    result.innerHTML = '<p>Voice recognition stopped</p>';
+                };
+                
+                voiceRecognition.start();
+            } else {
+                result.innerHTML = '<p style="color: #f44336;">Speech recognition not supported in this browser</p>';
+            }
+        }
+
+        function stopVoiceRecognition() {
+            if (voiceRecognition) {
+                voiceRecognition.stop();
+            }
+        }
+
+        function refreshSystemStats() {
+            // Simulate updating system statistics
+            const cpu = Math.floor(Math.random() * 100);
+            const memory = Math.floor(Math.random() * 100);
+            const disk = Math.floor(Math.random() * 100);
+            
+            document.getElementById('cpuUsage').style.width = cpu + '%';
+            document.getElementById('cpuText').textContent = cpu + '%';
+            
+            document.getElementById('memoryUsage').style.width = memory + '%';
+            document.getElementById('memoryText').textContent = memory + '%';
+            
+            document.getElementById('diskUsage').style.width = disk + '%';
+            document.getElementById('diskText').textContent = disk + '%';
+        }
+
+        // Initialize temperature slider
+        document.addEventListener('DOMContentLoaded', () => {
+            const tempSlider = document.getElementById('temperature');
+            const tempValue = document.getElementById('tempValue');
+            if (tempSlider && tempValue) {
+                tempSlider.addEventListener('input', () => {
+                    tempValue.textContent = tempSlider.value;
+                });
+            }
+        });
+
+        // Docker Management Functions
+        let containers = [];
+        let dockerImages = [];
+
+        function runContainer() {
+            const name = document.getElementById('containerName').value;
+            const image = document.getElementById('dockerImage').value;
+            const ports = document.getElementById('portMapping').value;
+            const status = document.getElementById('dockerStatus');
+
+            if (!name || !image) {
+                status.innerHTML = '<p style="color: #f44336;">Please fill in container name and image</p>';
+                return;
+            }
+
+            status.innerHTML = '<p>🚀 Starting container...</p>';
+            
+            setTimeout(() => {
+                const container = {
+                    id: 'cont_' + Date.now(),
+                    name: name,
+                    image: image,
+                    ports: ports,
+                    status: 'running',
+                    created: new Date().toISOString()
+                };
+                containers.push(container);
+                
+                status.innerHTML = `
+                    <p style="color: #4caf50;">✅ Container started successfully!</p>
+                    <p><strong>ID:</strong> ${container.id}</p>
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>Image:</strong> ${image}</p>
+                    <p><strong>Status:</strong> Running</p>
+                `;
+                updateContainerList();
+            }, 2000);
+        }
+
+        function stopContainer() {
+            const status = document.getElementById('dockerStatus');
+            if (containers.length === 0) {
+                status.innerHTML = '<p style="color: #f44336;">No containers to stop</p>';
+                return;
+            }
+
+            status.innerHTML = '<p>⏹️ Stopping container...</p>';
+            
+            setTimeout(() => {
+                containers = containers.filter(c => c.status !== 'running');
+                status.innerHTML = '<p style="color: #4caf50;">✅ All containers stopped</p>';
+                updateContainerList();
+            }, 1500);
+        }
+
+        function listContainers() {
+            updateContainerList();
+        }
+
+        function listImages() {
+            const result = document.getElementById('containerList');
+            const images = [
+                { id: 'img_1', name: 'nginx:latest', size: '133MB', created: '2023-12-15' },
+                { id: 'img_2', name: 'postgres:13', size: '376MB', created: '2023-12-14' },
+                { id: 'img_3', name: 'node:16', size: '943MB', created: '2023-12-13' }
+            ];
+            
+            result.innerHTML = `
+                <h4>Available Images:</h4>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Image Name</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Size</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${images.map(img => `
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${img.name}</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${img.size}</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${img.created}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function updateContainerList() {
+            const tbody = document.getElementById('containerTableBody');
+            if (containers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 16px;">No containers found</td></tr>';
+            } else {
+                tbody.innerHTML = containers.map(cont => `
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${cont.name}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${cont.image}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${cont.status}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${cont.ports}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function deployCompose() {
+            const compose = document.getElementById('composeFile').value;
+            const result = document.getElementById('composeResult');
+            
+            if (!compose) {
+                result.innerHTML = '<p style="color: #f44336;">Please enter compose configuration</p>';
+                return;
+            }
+
+            result.innerHTML = '<p>🚀 Deploying Docker Compose stack...</p>';
+            
+            setTimeout(() => {
+                result.innerHTML = `
+                    <p style="color: #4caf50;">✅ Stack deployed successfully!</p>
+                    <p><strong>Services:</strong> 2 services created</p>
+                    <p><strong>Containers:</strong> 2 containers running</p>
+                    <p><strong>Network:</strong> menubase_default created</p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px;">${compose}</pre>
+                `;
+            }, 3000);
+        }
+
+        function stopCompose() {
+            const result = document.getElementById('composeResult');
+            result.innerHTML = '<p>⏹️ Stopping Docker Compose stack...</p>';
+            
+            setTimeout(() => {
+                result.innerHTML = '<p style="color: #4caf50;">✅ Stack stopped successfully!</p>';
+            }, 1500);
+        }
+
+        // AWS Cloud Functions
+        let ec2Instances = [];
+        let databases = [];
+
+        function launchInstance() {
+            const name = document.getElementById('instanceName').value;
+            const type = document.getElementById('instanceType').value;
+            const ami = document.getElementById('amiType').value;
+            const status = document.getElementById('ec2Status');
+
+            if (!name) {
+                status.innerHTML = '<p style="color: #f44336;">Please enter instance name</p>';
+                return;
+            }
+
+            status.innerHTML = '<p>🚀 Launching EC2 instance...</p>';
+            
+            setTimeout(() => {
+                const instance = {
+                    id: 'i-' + Math.random().toString(36).substr(2, 8),
+                    name: name,
+                    type: type,
+                    ami: ami,
+                    status: 'running',
+                    publicIp: '52.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 255),
+                    launched: new Date().toISOString()
+                };
+                ec2Instances.push(instance);
+                
+                status.innerHTML = `
+                    <p style="color: #4caf50;">✅ Instance launched successfully!</p>
+                    <p><strong>Instance ID:</strong> ${instance.id}</p>
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>Type:</strong> ${type}</p>
+                    <p><strong>Public IP:</strong> ${instance.publicIp}</p>
+                    <p><strong>Status:</strong> Running</p>
+                `;
+                refreshAWSStats();
+            }, 3000);
+        }
+
+        function terminateInstance() {
+            const status = document.getElementById('ec2Status');
+            if (ec2Instances.length === 0) {
+                status.innerHTML = '<p style="color: #f44336;">No instances to terminate</p>';
+                return;
+            }
+
+            status.innerHTML = '<p>💥 Terminating instance...</p>';
+            
+            setTimeout(() => {
+                ec2Instances.pop();
+                status.innerHTML = '<p style="color: #4caf50;">✅ Instance terminated successfully</p>';
+                refreshAWSStats();
+            }, 2000);
+        }
+
+        function createDatabase() {
+            const type = document.getElementById('dbType').value;
+            const name = document.getElementById('dbName').value;
+            const user = document.getElementById('dbUser').value;
+            const status = document.getElementById('dbStatus');
+
+            if (!name || !user) {
+                status.innerHTML = '<p style="color: #f44336;">Please fill in database name and username</p>';
+                return;
+            }
+
+            status.innerHTML = '<p>🗄️ Creating database...</p>';
+            
+            setTimeout(() => {
+                const db = {
+                    id: 'db-' + Math.random().toString(36).substr(2, 8),
+                    type: type,
+                    name: name,
+                    user: user,
+                    status: 'available',
+                    endpoint: name + '.cluster-xyz.us-east-1.rds.amazonaws.com',
+                    created: new Date().toISOString()
+                };
+                databases.push(db);
+                
+                status.innerHTML = `
+                    <p style="color: #4caf50;">✅ Database created successfully!</p>
+                    <p><strong>Database ID:</strong> ${db.id}</p>
+                    <p><strong>Type:</strong> ${type}</p>
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>Endpoint:</strong> ${db.endpoint}</p>
+                    <p><strong>Status:</strong> Available</p>
+                `;
+                refreshAWSStats();
+            }, 4000);
+        }
+
+        function listDatabases() {
+            const status = document.getElementById('dbStatus');
+            if (databases.length === 0) {
+                status.innerHTML = '<p>No databases found</p>';
+            } else {
+                status.innerHTML = `
+                    <h4>Active Databases:</h4>
+                    ${databases.map(db => `
+                        <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 4px;">
+                            <p><strong>${db.name}</strong> (${db.type})</p>
+                            <p>Status: ${db.status}</p>
+                            <p>Endpoint: ${db.endpoint}</p>
+                        </div>
+                    `).join('')}
+                `;
+            }
+        }
+
+        function refreshAWSStats() {
+            document.getElementById('ec2Count').textContent = ec2Instances.length;
+            document.getElementById('dbCount').textContent = databases.length;
+            
+            const totalCost = (ec2Instances.length * 15) + (databases.length * 25);
+            document.getElementById('monthlyCost').textContent = '$' + totalCost + '.00';
+        }
+
+        // Kubernetes Functions
+        let clusters = [];
+        let deployments = [];
+
+        function createCluster() {
+            const name = document.getElementById('clusterName').value;
+            const type = document.getElementById('clusterType').value;
+            const nodes = document.getElementById('nodeCount').value;
+            const status = document.getElementById('clusterStatus');
+
+            if (!name) {
+                status.innerHTML = '<p style="color: #f44336;">Please enter cluster name</p>';
+                return;
+            }
+
+            status.innerHTML = '<p>🚀 Creating Kubernetes cluster...</p>';
+            
+            setTimeout(() => {
+                const cluster = {
+                    id: 'cluster-' + Math.random().toString(36).substr(2, 8),
+                    name: name,
+                    type: type,
+                    nodes: parseInt(nodes),
+                    status: 'active',
+                    created: new Date().toISOString()
+                };
+                clusters.push(cluster);
+                
+                status.innerHTML = `
+                    <p style="color: #4caf50;">✅ Cluster created successfully!</p>
+                    <p><strong>Cluster ID:</strong> ${cluster.id}</p>
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>Type:</strong> ${type}</p>
+                    <p><strong>Nodes:</strong> ${nodes}</p>
+                    <p><strong>Status:</strong> Active</p>
+                `;
+                updateK8sStats();
+            }, 5000);
+        }
+
+        function deleteCluster() {
+            const status = document.getElementById('clusterStatus');
+            if (clusters.length === 0) {
+                status.innerHTML = '<p style="color: #f44336;">No clusters to delete</p>';
+                return;
+            }
+
+            status.innerHTML = '<p>🗑️ Deleting cluster...</p>';
+            
+            setTimeout(() => {
+                clusters.pop();
+                status.innerHTML = '<p style="color: #4caf50;">✅ Cluster deleted successfully</p>';
+                updateK8sStats();
+            }, 3000);
+        }
+
+        function deployPod() {
+            const name = document.getElementById('deploymentName').value;
+            const image = document.getElementById('podImage').value;
+            const replicas = document.getElementById('replicas').value;
+            const port = document.getElementById('podPort').value;
+            const status = document.getElementById('deploymentStatus');
+
+            if (!name || !image) {
+                status.innerHTML = '<p style="color: #f44336;">Please fill in deployment name and image</p>';
+                return;
+            }
+
+            status.innerHTML = '<p>📦 Deploying pod...</p>';
+            
+            setTimeout(() => {
+                const deployment = {
+                    id: 'deploy-' + Math.random().toString(36).substr(2, 8),
+                    name: name,
+                    image: image,
+                    replicas: parseInt(replicas),
+                    port: parseInt(port),
+                    status: 'running',
+                    created: new Date().toISOString()
+                };
+                deployments.push(deployment);
+                
+                status.innerHTML = `
+                    <p style="color: #4caf50;">✅ Deployment successful!</p>
+                    <p><strong>Deployment ID:</strong> ${deployment.id}</p>
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>Image:</strong> ${image}</p>
+                    <p><strong>Replicas:</strong> ${replicas}</p>
+                    <p><strong>Port:</strong> ${port}</p>
+                    <p><strong>Status:</strong> Running</p>
+                `;
+                updateK8sStats();
+            }, 3000);
+        }
+
+        function scaleDeployment() {
+            const status = document.getElementById('deploymentStatus');
+            if (deployments.length === 0) {
+                status.innerHTML = '<p style="color: #f44336;">No deployments to scale</p>';
+                return;
+            }
+
+            const newReplicas = Math.floor(Math.random() * 10) + 1;
+            status.innerHTML = '<p>📈 Scaling deployment...</p>';
+            
+            setTimeout(() => {
+                deployments[0].replicas = newReplicas;
+                status.innerHTML = `<p style="color: #4caf50;">✅ Deployment scaled to ${newReplicas} replicas</p>`;
+                updateK8sStats();
+            }, 2000);
+        }
+
+        function getClusterInfo() {
+            const info = document.getElementById('clusterInfo');
+            if (clusters.length === 0) {
+                info.innerHTML = '<p>No clusters available</p>';
+            } else {
+                const cluster = clusters[0];
+                info.innerHTML = `
+                    <h4>Cluster Information:</h4>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px;">
+Name: ${cluster.name}
+Type: ${cluster.type}
+Nodes: ${cluster.nodes}
+Status: ${cluster.status}
+Created: ${cluster.created}
+                    </pre>
+                `;
+            }
+        }
+
+        function updateK8sStats() {
+            const totalNodes = clusters.reduce((sum, c) => sum + c.nodes, 0);
+            const totalPods = deployments.reduce((sum, d) => sum + d.replicas, 0);
+            
+            document.getElementById('nodeCount').textContent = totalNodes;
+            document.getElementById('podCount').textContent = totalPods;
+            document.getElementById('serviceCount').textContent = deployments.length;
+        }
+
+        // Agentic AI Functions
+        let agents = [];
+        let tasks = [];
+
+        function createAgent() {
+            const name = document.getElementById('agentName').value;
+            const type = document.getElementById('agentType').value;
+            const capabilities = document.getElementById('agentCapabilities').value;
+            const status = document.getElementById('agentStatus');
+
+            if (!name) {
+                status.innerHTML = '<p style="color: #f44336;">Please enter agent name</p>';
+                return;
+            }
+
+            status.innerHTML = '<p>🧞 Creating AI agent...</p>';
+            
+            setTimeout(() => {
+                const agent = {
+                    id: 'agent-' + Math.random().toString(36).substr(2, 8),
+                    name: name,
+                    type: type,
+                    capabilities: capabilities,
+                    status: 'active',
+                    created: new Date().toISOString()
+                };
+                agents.push(agent);
+                
+                // Update agent dropdown
+                const select = document.getElementById('selectedAgent');
+                const option = document.createElement('option');
+                option.value = agent.id;
+                option.textContent = agent.name;
+                select.appendChild(option);
+                
+                status.innerHTML = `
+                    <p style="color: #4caf50;">✅ Agent created successfully!</p>
+                    <p><strong>Agent ID:</strong> ${agent.id}</p>
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>Type:</strong> ${type}</p>
+                    <p><strong>Capabilities:</strong> ${capabilities}</p>
+                    <p><strong>Status:</strong> Active</p>
+                `;
+                updateAgentStats();
+            }, 2000);
+        }
+
+        function deleteAgent() {
+            const status = document.getElementById('agentStatus');
+            if (agents.length === 0) {
+                status.innerHTML = '<p style="color: #f44336;">No agents to delete</p>';
+                return;
+            }
+
+            status.innerHTML = '<p>🗑️ Deleting agent...</p>';
+            
+            setTimeout(() => {
+                agents.pop();
+                status.innerHTML = '<p style="color: #4caf50;">✅ Agent deleted successfully</p>';
+                updateAgentStats();
+            }, 1500);
+        }
+
+        function assignTask() {
+            const agentId = document.getElementById('selectedAgent').value;
+            const description = document.getElementById('taskDescription').value;
+            const priority = document.getElementById('taskPriority').value;
+            const status = document.getElementById('taskStatus');
+
+            if (!agentId || !description) {
+                status.innerHTML = '<p style="color: #f44336;">Please select an agent and describe the task</p>';
+                return;
+            }
+
+            status.innerHTML = '<p>📋 Assigning task to agent...</p>';
+            
+            setTimeout(() => {
+                const task = {
+                    id: 'task-' + Math.random().toString(36).substr(2, 8),
+                    agentId: agentId,
+                    description: description,
+                    priority: priority,
+                    status: 'in-progress',
+                    created: new Date().toISOString()
+                };
+                tasks.push(task);
+                
+                status.innerHTML = `
+                    <p style="color: #4caf50;">✅ Task assigned successfully!</p>
+                    <p><strong>Task ID:</strong> ${task.id}</p>
+                    <p><strong>Description:</strong> ${description}</p>
+                    <p><strong>Priority:</strong> ${priority}</p>
+                    <p><strong>Status:</strong> In Progress</p>
+                `;
+                updateAgentStats();
+            }, 2000);
+        }
+
+        function monitorTasks() {
+            const status = document.getElementById('taskStatus');
+            if (tasks.length === 0) {
+                status.innerHTML = '<p>No tasks found</p>';
+            } else {
+                status.innerHTML = `
+                    <h4>Active Tasks:</h4>
+                    ${tasks.map(task => `
+                        <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 4px;">
+                            <p><strong>${task.description}</strong></p>
+                            <p>Priority: ${task.priority}</p>
+                            <p>Status: ${task.status}</p>
+                        </div>
+                    `).join('')}
+                `;
+            }
+        }
+
+        function generateReport() {
+            const report = document.getElementById('agentReport');
+            const completedTasks = Math.floor(Math.random() * 50) + 10;
+            const successRate = Math.floor(Math.random() * 30) + 70;
+            
+            report.innerHTML = `
+                <h4>Weekly Agent Performance Report</h4>
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 4px;">
+                    <p><strong>Active Agents:</strong> ${agents.length}</p>
+                    <p><strong>Tasks Completed:</strong> ${completedTasks}</p>
+                    <p><strong>Success Rate:</strong> ${successRate}%</p>
+                    <p><strong>Average Response Time:</strong> 2.3 seconds</p>
+                    <p><strong>Total Processing Time:</strong> 45.2 hours</p>
+                </div>
+            `;
+        }
+
+        function updateAgentStats() {
+            document.getElementById('activeAgents').textContent = agents.length;
+            document.getElementById('completedTasks').textContent = Math.floor(Math.random() * 50) + 10;
+            document.getElementById('successRate').textContent = Math.floor(Math.random() * 30) + 70 + '%';
+        }
+
+        // File Management Functions
+        let uploadedFiles = [];
+
+        function handleFileUpload(event) {
+            const files = event.target.files;
+            const result = document.getElementById('uploadResult');
+            
+            if (files.length === 0) return;
+            
+            result.innerHTML = '<p>📁 Uploading files...</p>';
+            
+            setTimeout(() => {
+                Array.from(files).forEach(file => {
+                    const fileObj = {
+                        id: 'file-' + Math.random().toString(36).substr(2, 8),
+                        name: file.name,
+                        size: (file.size / 1024 / 1024).toFixed(2) + ' MB',
+                        type: getFileType(file.name),
+                        modified: new Date().toISOString(),
+                        url: URL.createObjectURL(file)
+                    };
+                    uploadedFiles.push(fileObj);
+                });
+                
+                result.innerHTML = `
+                    <p style="color: #4caf50;">✅ ${files.length} file(s) uploaded successfully!</p>
+                    <p>Files: ${Array.from(files).map(f => f.name).join(', ')}</p>
+                `;
+                
+                updateFileList();
+                updateFileStats();
+            }, 2000);
+        }
+
+        function getFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext)) return 'image';
+            if (['pdf', 'doc', 'docx', 'txt'].includes(ext)) return 'document';
+            if (['mp4', 'avi', 'mov'].includes(ext)) return 'video';
+            if (['zip', 'rar', '7z'].includes(ext)) return 'archive';
+            return 'other';
+        }
+
+        function searchFiles() {
+            const query = document.getElementById('fileSearch').value.toLowerCase();
+            const typeFilter = document.getElementById('fileTypeFilter').value;
+            const result = document.getElementById('searchResult');
+            
+            let filtered = uploadedFiles;
+            
+            if (query) {
+                filtered = filtered.filter(file => file.name.toLowerCase().includes(query));
+            }
+            
+            if (typeFilter) {
+                filtered = filtered.filter(file => file.type === typeFilter);
+            }
+            
+            if (filtered.length === 0) {
+                result.innerHTML = '<p>No files found matching your criteria</p>';
+            } else {
+                result.innerHTML = `
+                    <h4>Search Results (${filtered.length} files):</h4>
+                    ${filtered.map(file => `
+                        <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 4px;">
+                            <p><strong>${file.name}</strong></p>
+                            <p>Size: ${file.size} | Type: ${file.type}</p>
+                        </div>
+                    `).join('')}
+                `;
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('fileSearch').value = '';
+            document.getElementById('fileTypeFilter').value = '';
+            document.getElementById('searchResult').innerHTML = '';
+        }
+
+        function updateFileList() {
+            const tbody = document.getElementById('fileTableBody');
+            if (uploadedFiles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 16px;">No files uploaded yet</td></tr>';
+            } else {
+                tbody.innerHTML = uploadedFiles.map(file => `
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${file.name}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${file.size}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${new Date(file.modified).toLocaleDateString()}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">
+                            <button class="btn" style="padding: 4px 8px; font-size: 12px;" onclick="downloadFile('${file.id}')">💾 Download</button>
+                            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteFile('${file.id}')">🗑️ Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function downloadFile(fileId) {
+            const file = uploadedFiles.find(f => f.id === fileId);
+            if (file) {
+                const link = document.createElement('a');
+                link.href = file.url;
+                link.download = file.name;
+                link.click();
+            }
+        }
+
+        function deleteFile(fileId) {
+            uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
+            updateFileList();
+            updateFileStats();
+        }
+
+        function refreshFileList() {
+            updateFileList();
+        }
+
+        function updateFileStats() {
+            document.getElementById('totalFiles').textContent = uploadedFiles.length;
+            
+            const totalSize = uploadedFiles.reduce((sum, file) => {
+                return sum + parseFloat(file.size);
+            }, 0);
+            document.getElementById('storageUsed').textContent = totalSize.toFixed(2) + ' MB';
+            
+            const uniqueTypes = new Set(uploadedFiles.map(f => f.type)).size;
+            document.getElementById('fileTypes').textContent = uniqueTypes;
+        }
+
+        // Windows Management Functions
+        let powershellHistory = [];
+
+        function scanSystem() {
+            const scanType = document.getElementById('scanType').value;
+            const result = document.getElementById('systemInfo');
+            
+            result.innerHTML = '<p>🔍 Scanning system...</p>';
+            
+            setTimeout(() => {
+                const systemInfo = {
+                    basic: `
+System Information:
+- OS: Windows 11 Pro
+- Version: 22H2
+- Build: 22621.2861
+- Architecture: x64
+- Processor: Intel Core i7-12700K
+- RAM: 32 GB
+- Disk: 1 TB SSD`,
+                    detailed: `
+Detailed System Report:
+- OS: Windows 11 Pro (22H2)
+- Build: 22621.2861
+- Architecture: x64
+- Processor: Intel Core i7-12700K @ 3.60GHz
+- RAM: 32 GB DDR4-3200
+- Disk: 1 TB NVMe SSD
+- Graphics: NVIDIA RTX 4070
+- Network: Intel Wi-Fi 6E
+- Last Boot: ${new Date().toLocaleString()}`,
+                    performance: `
+Performance Analysis:
+- CPU Usage: 35% (Normal)
+- Memory Usage: 58% (Normal)
+- Disk Usage: 72% (Warning)
+- Network: 100 Mbps
+- Temperature: 45°C
+- Power Plan: Balanced`,
+                    security: `
+Security Check Results:
+- Windows Defender: Active ✅
+- Firewall: Enabled ✅
+- Updates: Up to date ✅
+- Antivirus: Real-time protection enabled ✅
+- BitLocker: Not enabled ⚠️
+- UAC: Enabled ✅`
+                };
+                
+                result.innerHTML = `<pre style="white-space: pre-wrap;">${systemInfo[scanType]}</pre>`;
+            }, 2000);
+        }
+
+        function exportReport() {
+            const result = document.getElementById('systemInfo');
+            result.innerHTML += '<p style="color: #4caf50;">📄 Report exported to system_report.txt</p>';
+        }
+
+        function addPowerShellOutput(text) {
+            const output = document.getElementById('powershellOutput');
+            const prompt = document.getElementById('powershellPrompt');
+            
+            prompt.remove();
+            
+            const div = document.createElement('div');
+            div.textContent = text;
+            output.appendChild(div);
+            
+            const newPrompt = document.createElement('div');
+            newPrompt.id = 'powershellPrompt';
+            newPrompt.innerHTML = 'PS C:\\Users\\Admin> <input type="text" class="terminal-input" id="powershellInput" onkeypress="handlePowerShellInput(event)">';
+            output.appendChild(newPrompt);
+            
+            document.getElementById('powershellInput').focus();
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function handlePowerShellInput(event) {
+            if (event.key === 'Enter') {
+                const input = event.target;
+                const command = input.value.trim();
+                
+                if (command) {
+                    powershellHistory.push(command);
+                    addPowerShellOutput(`PS C:\\Users\\Admin> ${command}`);
+                    executePowerShellCommand(command);
+                    input.value = '';
+                }
+            }
+        }
+
+        function executePowerShellCommand(command) {
+            const commands = {
+                'Get-Process': 'Handles  NPM(K)    PM(K)      WS(K) VM(M)   CPU(s)     Id ProcessName\n-------  ------    -----      ----- -----   ------     -- -----------\n    123      12     1234     5678    45     0.23    1234 explorer\n    456      23     2345     6789    67     0.45    2345 chrome',
+                'Get-Service': 'Status   Name               DisplayName\n------   ----               -----------\nRunning  spooler            Print Spooler\nStopped  bits               Background Intelligent Transfer Service\nRunning  themes             Themes',
+                'Get-ComputerInfo': `WindowsProductName : Windows 11 Pro\nWindowsVersion : 22H2\nWindowsBuildLabEx : 22621.2861.amd64fre.ni_release.231018-1437\nTotalPhysicalMemory : 34359738368\nAvailablePhysicalMemory : 14411518808\nPSVersion : 5.1.22621.2861`,
+                'Get-Date': new Date().toString(),
+                'Clear-Host': () => {
+                    document.getElementById('powershellOutput').innerHTML = `
+                        <div id="powershellPrompt">PS C:\\Users\\Admin> <input type="text" class="terminal-input" id="powershellInput" onkeypress="handlePowerShellInput(event)"></div>
+                    `;
+                    document.getElementById('powershellInput').focus();
+                    return null;
+                }
+            };
+            
+            const response = commands[command] || `The term '${command}' is not recognized as the name of a cmdlet, function, script file, or operable program.`;
+            
+            if (typeof response === 'function') {
+                response();
+            } else if (response !== null) {
+                addPowerShellOutput(response);
+            }
+        }
+
+        function startService() {
+            const service = document.getElementById('serviceName').value;
+            const status = document.getElementById('serviceStatus');
+            
+            status.innerHTML = '<p>▶️ Starting service...</p>';
+            
+            setTimeout(() => {
+                status.innerHTML = `<p style="color: #4caf50;">✅ Service '${service}' started successfully</p>`;
+            }, 1500);
+        }
+
+        function stopService() {
+            const service = document.getElementById('serviceName').value;
+            const status = document.getElementById('serviceStatus');
+            
+            status.innerHTML = '<p>⏹️ Stopping service...</p>';
+            
+            setTimeout(() => {
+                status.innerHTML = `<p style="color: #4caf50;">✅ Service '${service}' stopped successfully</p>`;
+            }, 1500);
+        }
+
+        function restartService() {
+            const service = document.getElementById('serviceName').value;
+            const status = document.getElementById('serviceStatus');
+            
+            status.innerHTML = '<p>🔄 Restarting service...</p>';
+            
+            setTimeout(() => {
+                status.innerHTML = `<p style="color: #4caf50;">✅ Service '${service}' restarted successfully</p>`;
+            }, 2000);
+        }
+
+        function refreshWindowsStats() {
+            const cpu = Math.floor(Math.random() * 100);
+            const memory = Math.floor(Math.random() * 100);
+            const disk = Math.floor(Math.random() * 100);
+            
+            document.getElementById('winCpuUsage').style.width = cpu + '%';
+            document.getElementById('winCpuText').textContent = cpu + '%';
+            
+            document.getElementById('winMemoryUsage').style.width = memory + '%';
+            document.getElementById('winMemoryText').textContent = memory + '%';
+            
+            document.getElementById('winDiskUsage').style.width = disk + '%';
+            document.getElementById('winDiskText').textContent = disk + '%';
+        }
+
+        // Enhanced initialization with precision improvements
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize file upload drag and drop for Files section
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            if (fileUploadArea) {
+                fileUploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    fileUploadArea.classList.add('dragover');
+                });
+                fileUploadArea.addEventListener('dragleave', () => {
+                    fileUploadArea.classList.remove('dragover');
+                });
+                fileUploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    fileUploadArea.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        handleFileUpload({ target: { files } });
+                    }
+                });
+            }
+
+            // Enhanced theme persistence with smooth transitions
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeToggle').innerHTML = '☀️';
+            }
+
+            // Add smooth loading animations
+            const cards = document.querySelectorAll('.feature-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Enhanced button click feedback
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Create ripple effect
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+
+            // Add precision hover effects for menu items
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(12px) scale(1.03)';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0) scale(1)';
+                });
+            });
+        });
+
+        // Add ripple effect styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .btn {
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(0);
+                animation: ripple-animation 0.6s linear;
+                pointer-events: none;
+            }
+            
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
