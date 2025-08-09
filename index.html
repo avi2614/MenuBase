@@ -503,6 +503,129 @@
             color: #ccc;
         }
 
+        /* Footer Styles */
+        .footer {
+            margin-top: 60px;
+            padding: 40px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), transparent);
+        }
+
+        .footer-content {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(25px) saturate(180%);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.12),
+                0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .footer-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .footer-content:hover::before {
+            left: 100%;
+        }
+
+        .footer-content:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 20px 50px rgba(102, 126, 234, 0.2),
+                0 0 0 1px rgba(102, 126, 234, 0.1) inset;
+        }
+
+        .made-by {
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+            margin-bottom: 8px;
+        }
+
+        .author-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .footer-subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .dark-mode .footer-content {
+            background: rgba(20, 20, 25, 0.92);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+        }
+
+        .dark-mode .footer-content:hover {
+            box-shadow: 
+                0 20px 50px rgba(79, 172, 254, 0.2),
+                0 0 0 1px rgba(79, 172, 254, 0.1) inset;
+        }
+
+        .dark-mode .made-by {
+            background: linear-gradient(135deg, #4facfe, #00f2fe, #667eea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dark-mode .author-name {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dark-mode .footer-subtitle {
+            color: #ccc;
+        }
+
+        .footer-icon {
+            font-size: 2rem;
+            margin-bottom: 16px;
+            animation: float 3s ease-in-out infinite;
+        }
+
         /* Chips */
         .chip-container {
             display: flex;
@@ -1016,6 +1139,16 @@
             <div class="content-area" id="contentArea">
                 <!-- Content will be loaded here -->
             </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="footer-content">
+                    <div class="footer-icon">🚀</div>
+                    <div class="made-by">Made with ❤️ by</div>
+                    <div class="author-name">Avi Sharma</div>
+                    <div class="footer-subtitle">Full Stack Developer & UI/UX Enthusiast</div>
+                </div>
+            </footer>
         </main>
     </div>
 
